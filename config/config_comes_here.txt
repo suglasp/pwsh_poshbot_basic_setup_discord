@@ -1,0 +1,1 @@
+poshbot will store it's config here
