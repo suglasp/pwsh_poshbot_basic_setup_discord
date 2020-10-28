@@ -1,12 +1,7 @@
 
 #
 # Create a new Poshbot plugin (Powershell Module).
-# Pieter De Ridder aka Suglasp
-#
 # Notice : This script creates a "simple" Poshbot plugin.
-#
-# Create date : 17/09/2020
-# Change date : 18/09/2020
 #
 # Reading:
 # Simple Plugin   : https://poshbot.readthedocs.io/en/latest/guides/plugin-configuration/
@@ -23,18 +18,22 @@ If (-Not (Test-Path $global:PoshPluginsPath)) {
     New-Item $global:PoshPluginsPath -ItemType Directory
 }
 
+
+[string]$NewPluginName = Read-Host -Prompt "Enter Poshbot Plugin Name"
+
+
 # create module manifest file
-If (-Not (Test-Path "$($global:PoshPluginsPath)\MyPoshBotPlugin")) {
-    New-Item "$($global:PoshPluginsPath)\MyPoshBotPlugin" -ItemType Directory
+If (-Not (Test-Path "$($global:PoshPluginsPath)\$($NewPluginName)")) {
+    New-Item "$($global:PoshPluginsPath)\$($NewPluginName)" -ItemType Directory
     
-    [string]$manifestFilename = "$($global:PoshPluginsPath)\MyPoshBotPlugin\MyPoshBotPlugin.psd1"
-    [string]$moduleFilename = "$($global:PoshPluginsPath)\MyPoshBotPlugin\MyPoshBotPlugin.psm1"
+    [string]$manifestFilename = "$($global:PoshPluginsPath)\$($NewPluginName)\$($NewPluginName).psd1"
+    [string]$moduleFilename = "$($global:PoshPluginsPath)\$($NewPluginName)\$($NewPluginName).psm1"
     [string]$guid = $(New-Guid)
 
     # create the meta file
     $params = @{
         Path = $manifestFilename
-        RootModule = $moduleFilename
+        RootModule = $(Split-Path $moduleFilename -Leaf)
         ModuleVersion = '0.1.0'
         Guid = $guid
         Author = $($env:USERNAME)
