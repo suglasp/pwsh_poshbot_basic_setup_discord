@@ -10,35 +10,46 @@
 #
 
 # global vars
-$global:WorkingDir = $($PSScriptRoot)
-$global:PoshPluginsPath = "$($global:WorkingDir)\plugins"
+$global:WorkFolder = $($PSScriptRoot)
+$global:WebPluginsPath = "$($global:WorkFolder)\plugins"
 
 # create plugins folder
-If (-Not (Test-Path $global:PoshPluginsPath)) {
-    New-Item $global:PoshPluginsPath -ItemType Directory
+If (-Not (Test-Path $global:WebPluginsPath)) {
+    New-Item $global:WebPluginsPath -ItemType Directory
 }
 
+[string]$NewPluginName = Read-Host -Prompt "Enter Poshbot Plugin Name (ex.: MyPoshbotPlugin)"
+[string]$NewPluginDesc = Read-Host -Prompt "Enter Plugin Description"
+[string]$NewPluginAuthor = Read-Host -Prompt "Enter Plugin Author Name"
 
-[string]$NewPluginName = Read-Host -Prompt "Enter Poshbot Plugin Name"
+# sanity checks
+If ([string]::IsNullOrEmpty($NewPluginName)) {
+  Write-Warning "You must provide a Plugin name!"
+  Exit(-1)
+}
 
+# set default Author name
+If ([string]::IsNullOrEmpty($NewPluginAuthor)) {
+    $NewPluginAuthor = [environment]::GetEnvironmentVariable("USERNAME")
+}
 
 # create module manifest file
-If (-Not (Test-Path "$($global:PoshPluginsPath)\$($NewPluginName)")) {
-    New-Item "$($global:PoshPluginsPath)\$($NewPluginName)" -ItemType Directory
+If (-Not (Test-Path "$($global:WebPluginsPath)\$($NewPluginName)")) {
+    New-Item "$($global:WebPluginsPath)\$($NewPluginName)" -ItemType Directory
     
-    [string]$manifestFilename = "$($global:PoshPluginsPath)\$($NewPluginName)\$($NewPluginName).psd1"
-    [string]$moduleFilename = "$($global:PoshPluginsPath)\$($NewPluginName)\$($NewPluginName).psm1"
+    [string]$manifestFilename = "$($global:WebPluginsPath)\$($NewPluginName)\$($NewPluginName).psd1"
+    [string]$moduleFilename = "$($global:WebPluginsPath)\$($NewPluginName)\$($NewPluginName).psm1"
     [string]$guid = $(New-Guid)
 
     # create the meta file
     $params = @{
         Path = $manifestFilename
         RootModule = $(Split-Path $moduleFilename -Leaf)
-        ModuleVersion = '0.1.0'
+        ModuleVersion = '1.0.0.0'
         Guid = $guid
-        Author = $($env:USERNAME)
-        Description = 'My PoshBot Plugin'
-        RequiredModules = @("Poshbot")
+        Author = $($NewPluginAuthor)
+        Description = $($NewPluginDesc)
+        #RequiredModules = @("Web.Global")
     }
     New-ModuleManifest @params
 
@@ -46,20 +57,35 @@ If (-Not (Test-Path "$($global:PoshPluginsPath)\$($NewPluginName)")) {
     New-Item -Path $moduleFilename -ItemType File
 
     # add some content already
-    Add-Content -Path $moduleFilename -Value '# My Poshbot plugin'
-    Add-Content -Path $moduleFilename -Value ''
-    Add-Content -Path $moduleFilename -Value '$CommandsToExport = @()'
-    Add-Content -Path $moduleFilename -Value ''
-    Add-Content -Path $moduleFilename -Value 'function Invoke-HelloWorld {'
-    Add-Content -Path $moduleFilename -Value '  Write-Output "Hello"'
-    Add-Content -Path $moduleFilename -Value '}'
-    Add-Content -Path $moduleFilename -Value '$CommandsToExport += "Invoke-HelloWorld"'
-    Add-Content -Path $moduleFilename -Value ''
-    Add-Content -Path $moduleFilename -Value ''
-    Add-Content -Path $moduleFilename -Value 'Export-ModuleMember -Function $CommandsToExport'
-    Add-Content -Path $moduleFilename -Value ''
+    [string]$timeStampCreated = $(Get-Date).ToString("dd/MM/yyyy")
 
-    Write-Host "Poshbot Plugin created"
+    Add-Content -Path $moduleFilename -Value ""
+    Add-Content -Path $moduleFilename -Value "#"
+    Add-Content -Path $moduleFilename -Value "# $($NewPluginAuthor)"
+    Add-Content -Path $moduleFilename -Value "# $($NewPluginDesc)"
+    Add-Content -Path $moduleFilename -Value "#"
+    Add-Content -Path $moduleFilename -Value "# created : $($timeStampCreated)"
+    Add-Content -Path $moduleFilename -Value "# changed : $($timeStampCreated)"
+    Add-Content -Path $moduleFilename -Value "#"
+    Add-Content -Path $moduleFilename -Value ""
+    Add-Content -Path $moduleFilename -Value '$CommandsToExport = @()'
+    Add-Content -Path $moduleFilename -Value ""
+    Add-Content -Path $moduleFilename -Value "#"
+    Add-Content -Path $moduleFilename -Value "# Function : Invoke-HelloPoshWorld"
+    Add-Content -Path $moduleFilename -Value "#"
+    Add-Content -Path $moduleFilename -Value "Function Invoke-HelloPoshWorld {"
+    Add-Content -Path $moduleFilename -Value '  Write-Output "Hello from POSHBOT"'
+    Add-Content -Path $moduleFilename -Value "}"
+    Add-Content -Path $moduleFilename -Value '$CommandsToExport += "Invoke-HelloPoshWorld"'
+    Add-Content -Path $moduleFilename -Value ""
+    Add-Content -Path $moduleFilename -Value ""
+    Add-Content -Path $moduleFilename -Value 'Export-ModuleMember -Function $CommandsToExport'
+    Add-Content -Path $moduleFilename -Value ""
+
+    Write-Host "Webserver Plugin has been created!"
 } else {
-    Write-Warning "Poshbot Plugin with same name already present!"
+    Write-Warning "Webserver Plugin with same name already present!"
+    Exit(-1)
 }
+
+Exit(0)
