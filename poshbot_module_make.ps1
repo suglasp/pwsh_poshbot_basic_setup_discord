@@ -11,11 +11,11 @@
 
 # global vars
 $global:WorkFolder = $($PSScriptRoot)
-$global:WebPluginsPath = "$($global:WorkFolder)\plugins"
+$global:PoshPluginsPath = "$($global:WorkFolder)\plugins"
 
 # create plugins folder
-If (-Not (Test-Path $global:WebPluginsPath)) {
-    New-Item $global:WebPluginsPath -ItemType Directory
+If (-Not (Test-Path $global:PoshPluginsPath)) {
+    New-Item $global:PoshPluginsPath -ItemType Directory
 }
 
 [string]$NewPluginName = Read-Host -Prompt "Enter Poshbot Plugin Name (ex.: MyPoshbotPlugin)"
@@ -34,11 +34,11 @@ If ([string]::IsNullOrEmpty($NewPluginAuthor)) {
 }
 
 # create module manifest file
-If (-Not (Test-Path "$($global:WebPluginsPath)\$($NewPluginName)")) {
-    New-Item "$($global:WebPluginsPath)\$($NewPluginName)" -ItemType Directory
+If (-Not (Test-Path "$($global:PoshPluginsPath)\$($NewPluginName)")) {
+    New-Item "$($global:PoshPluginsPath)\$($NewPluginName)" -ItemType Directory
     
-    [string]$manifestFilename = "$($global:WebPluginsPath)\$($NewPluginName)\$($NewPluginName).psd1"
-    [string]$moduleFilename = "$($global:WebPluginsPath)\$($NewPluginName)\$($NewPluginName).psm1"
+    [string]$manifestFilename = "$($global:PoshPluginsPath)\$($NewPluginName)\$($NewPluginName).psd1"
+    [string]$moduleFilename = "$($global:PoshPluginsPath)\$($NewPluginName)\$($NewPluginName).psm1"
     [string]$guid = $(New-Guid)
 
     # create the meta file
